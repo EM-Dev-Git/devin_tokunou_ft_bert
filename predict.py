@@ -14,7 +14,25 @@ MAX_SEQ_LENGTH = 128
 CATEGORIES = ['データサイエンティスト', '機械学習エンジニア', 'ソフトウェアエンジニア', 'コンサルタント']
 
 def predict_job_category(text):
-    """テキストから職種を予測"""
+    """
+    テキストから職種を予測する関数
+    
+    機能:
+    1. トークナイザーとモデルの初期化
+    2. テキストを前処理（トークン化、ID変換、パディングなど）
+    3. モデルを使用して職種を予測
+    4. 各カテゴリの確率を計算
+    
+    引数:
+        text (str): 職種を予測したい求人情報のテキスト
+        
+    戻り値:
+        dict: 予測結果を含む辞書
+            - predicted_category (str): 予測された職種カテゴリ
+            - probabilities (dict): 各カテゴリの確率
+            
+        モデルファイルが見つからない場合はNoneを返す
+    """
     
     tokenizer = BertTokenizer(VOCAB_FILE, do_lower_case=True)
     
@@ -77,7 +95,23 @@ def predict_job_category(text):
     return result
 
 def main():
-    """メイン関数"""
+    """
+    サンプルテキストに対して職種予測を実行し、結果を表示するメイン関数
+    
+    機能:
+    1. 各職種カテゴリ（データサイエンティスト、機械学習エンジニア、ソフトウェアエンジニア、コンサルタント）のサンプルテキストを用意
+    2. 各サンプルテキストに対して職種予測を実行
+    3. 予測結果と確率を表示
+    
+    引数:
+        なし
+        
+    戻り値:
+        なし
+        
+    副作用:
+        予測結果が標準出力に表示される
+    """
     
     sample_texts = [
         "Seeking a data scientist with experience in machine learning, statistical analysis, and data visualization. Must have skills in Python, R, and SQL.",

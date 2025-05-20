@@ -29,29 +29,65 @@ NUM_EPOCHS = 5
 NUM_LABELS = 4  # 4つの職種カテゴリ
 
 class JobDataset(Dataset):
-    """求人情報のデータセット"""
+    """
+    求人情報のテキストとラベルを扱うためのデータセットクラス
+    PyTorchのDatasetクラスを継承し、データローダーで使用できるようにする
+    """
     
     def __init__(self, csv_file, tokenizer, max_length=128):
         """
-        初期化
-        csv_file: データファイルのパス
-        tokenizer: トークナイザー
-        max_length: 最大シーケンス長
+        JobDatasetクラスの初期化メソッド
+        
+        引数:
+            csv_file (str): データファイルのパス。テキストとラベルの列を持つCSVファイル
+            tokenizer (BertTokenizer): テキストをトークン化するためのトークナイザー
+            max_length (int, optional): 最大シーケンス長。デフォルト値は128
+            
+        副作用:
+            - CSVファイルからデータを読み込む
+            - クラス属性（data, tokenizer, max_length）を初期化
         """
         self.data = pd.read_csv(csv_file)
         self.tokenizer = tokenizer
         self.max_length = max_length
         
     def __len__(self):
+        """
+        データセットの長さ（サンプル数）を返すメソッド
+        
+        戻り値:
+            int: データセットのサンプル数
+        """
         return len(self.data)
         
     def __getitem__(self, idx):
+        """
+        指定されたインデックスのサンプルを取得するメソッド
+        
+        引数:
+            idx (int): 取得するサンプルのインデックス
+            
+        戻り値:
+            dict: モデルの入力に必要な各種テンソルを含む辞書
+                - input_ids: 入力テキストのIDシーケンス
+                - attention_mask: アテンションマスク（パディングでないトークンは1、パディングは0）
+                - token_type_ids: トークンタイプID（単一文なので全て0）
+                - label: サンプルのラベル
+                
+        処理内容:
+            1. データフレームから指定インデックスのテキストとラベルを取得
+            2. テキストをトークン化し、最大長を超える場合は切り詰め
+            3. 特殊トークン（[CLS], [SEP]）を追加
+            4. トークンをIDに変換
+            5. パディングと各種マスクの適用
+            6. PyTorchテンソルに変換
+        """
         text = self.data.iloc[idx]['text']
         label = self.data.iloc[idx]['label']
         
         tokens = self.tokenizer.tokenize(text)
         
-        if len(tokens) > self.max_length - 2:  # [CLS]と[SEP]のための2トークン
+        if len(tokens) > self.max_length - 2:
             tokens = tokens[:self.max_length - 2]
             
         tokens = ['[CLS]'] + tokens + ['[SEP]']
@@ -78,7 +114,29 @@ class JobDataset(Dataset):
         }
 
 def train_model():
-    """BERTモデルの学習を実行"""
+    """
+    BERTモデルを求人情報の分類タスクでファインチューニングする関数
+    
+    機能:
+    1. トークナイザーとデータセットの初期化
+    2. BERTモデルの設定と初期化
+    3. 事前学習済みの重みの読み込み
+    4. ファインチューニングの実行（訓練と評価）
+    5. 学習したモデルの保存
+    6. 学習曲線の生成と保存
+    
+    引数:
+        なし
+        
+    戻り値:
+        なし
+        
+    副作用:
+        - モデルの学習が行われる
+        - 学習したモデルが結果ディレクトリに保存される
+        - 学習曲線グラフが結果ディレクトリに保存される
+        - 学習の進行状況と結果が標準出力に表示される
+    """
     
     tokenizer = BertTokenizer(VOCAB_FILE, do_lower_case=True)
     

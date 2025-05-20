@@ -5,7 +5,24 @@ import torch
 BERT_BASE_UNCASED_URL = "https://s3.amazonaws.com/models.huggingface.co/bert/bert-base-uncased-vocab.txt"
 
 def download_bert_files():
-    """BERTの語彙ファイルと事前学習済みモデルをダウンロード"""
+    """
+    BERTの語彙ファイルと事前学習済みモデルをダウンロードする関数
+    
+    機能:
+    1. BERT-base-uncasedの語彙ファイルをダウンロード
+    2. Transformersライブラリを使用して事前学習済みBERTモデルをダウンロードし、保存
+    
+    引数:
+        なし
+        
+    戻り値:
+        なし
+        
+    副作用:
+        - ~/bert_finetuning_project/vocab/bert-base-uncased-vocab.txt ファイルを作成
+        - ~/bert_finetuning_project/weights/pytorch_model.bin ファイルを作成
+        - ダウンロード状況を標準出力に表示
+    """
     
     vocab_dir = os.path.join(os.path.expanduser("~"), "bert_finetuning_project", "vocab")
     weights_dir = os.path.join(os.path.expanduser("~"), "bert_finetuning_project", "weights")

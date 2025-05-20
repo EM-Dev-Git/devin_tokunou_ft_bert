@@ -32,11 +32,29 @@ job_descriptions = [
 labels = [0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3]
 
 def create_sample_dataset():
-    """サンプルデータセットを作成し、CSVファイルに保存"""
+    """
+    サンプルデータセットを作成し、CSVファイルに保存する関数
+    
+    機能:
+    1. 求人情報のテキストとそれに対応するラベルからデータフレームを作成
+    2. データを訓練用とテスト用に分割（訓練:70%, テスト:30%）
+    3. 分割したデータをCSVファイルとして保存
+    
+    引数:
+        なし
+        
+    戻り値:
+        なし（CSVファイルとして保存される）
+        
+    副作用:
+        - ~/bert_finetuning_project/data/train.csv ファイルを作成
+        - ~/bert_finetuning_project/data/test.csv ファイルを作成
+        - 処理結果をコンソールに出力
+    """
     
     df = pd.DataFrame({
-        'text': job_descriptions,
-        'label': labels
+        'text': job_descriptions,  # テキスト列
+        'label': labels            # ラベル列
     })
     
     train_df, test_df = train_test_split(df, test_size=0.3, stratify=df['label'], random_state=42)
