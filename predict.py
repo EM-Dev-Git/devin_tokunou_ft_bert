@@ -7,13 +7,14 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 BASE_DIR = os.path.join(os.path.expanduser("~"), "bert_finetuning_project")
 VOCAB_FILE = os.path.join(BASE_DIR, "vocab", "bert-base-uncased-vocab.txt")
-MODEL_FILE = os.path.join(BASE_DIR, "results", "finetuned_model.pth")
+FINETUNED_MODEL_FILE = os.path.join(BASE_DIR, "results", "finetuned_model.pth")
+ORIGINAL_MODEL_FILE = os.path.join(BASE_DIR, "weights", "pytorch_model.bin")
 
 MAX_SEQ_LENGTH = 128
 
 CATEGORIES = ['データサイエンティスト', '機械学習エンジニア', 'ソフトウェアエンジニア', 'コンサルタント']
 
-def predict_job_category(text):
+def predict_job_category(text, model_type="finetuned"):
     """
     テキストから職種を予測する関数
     
@@ -25,6 +26,7 @@ def predict_job_category(text):
     
     引数:
         text (str): 職種を予測したい求人情報のテキスト
+        model_type (str): 使用するモデルのタイプ。"original"または"finetuned"
         
     戻り値:
         dict: 予測結果を含む辞書
@@ -46,11 +48,29 @@ def predict_job_category(text):
     
     model = BertForSequenceClassification(config, num_labels=len(CATEGORIES))
     
-    if os.path.exists(MODEL_FILE):
-        model.load_state_dict(torch.load(MODEL_FILE, map_location=device))
-        print("ファインチューニングされたモデルを読み込みました")
+    if model_type == "finetuned":
+        if os.path.exists(FINETUNED_MODEL_FILE):
+            model.load_state_dict(torch.load(FINETUNED_MODEL_FILE, map_location=device))
+            print("ファインチューニングされたモデルを読み込みました")
+        else:
+            print("ファインチューニングされたモデルファイルが見つかりません")
+            return None
+    elif model_type == "original":
+        if os.path.exists(ORIGINAL_MODEL_FILE):
+            pretrained_weights = torch.load(ORIGINAL_MODEL_FILE, map_location=device)
+            
+            model_weights = model.state_dict()
+            for name, param in pretrained_weights.items():
+                if name in model_weights and 'bert' in name:
+                    model_weights[name] = param
+            
+            model.load_state_dict(model_weights, strict=False)
+            print("元のモデル（事前学習済みモデル）を読み込みました")
+        else:
+            print("元のモデルファイルが見つかりません")
+            return None
     else:
-        print("モデルファイルが見つかりません")
+        print(f"不明なモデルタイプ: {model_type}")
         return None
     
     model = model.to(device)
@@ -96,12 +116,12 @@ def predict_job_category(text):
 
 def main():
     """
-    サンプルテキストに対して職種予測を実行し、結果を表示するメイン関数
+    サンプルテキストに対して元のモデルと学習後のモデルの予測結果を比較する関数
     
     機能:
     1. 各職種カテゴリ（データサイエンティスト、機械学習エンジニア、ソフトウェアエンジニア、コンサルタント）のサンプルテキストを用意
-    2. 各サンプルテキストに対して職種予測を実行
-    3. 予測結果と確率を表示
+    2. 各サンプルテキストに対して元のモデルと学習後のモデルで職種予測を実行
+    3. 両モデルの予測結果と確率を比較表示
     
     引数:
         なし
@@ -121,16 +141,32 @@ def main():
     ]
     
     for i, text in enumerate(sample_texts):
-        print(f"\nサンプル {i+1}:")
+        print(f"\n===== サンプル {i+1} =====")
         print(f"テキスト: {text[:100]}...")
         
-        result = predict_job_category(text)
+        original_result = predict_job_category(text, model_type="original")
         
-        if result:
-            print(f"予測カテゴリ: {result['predicted_category']}")
+        finetuned_result = predict_job_category(text, model_type="finetuned")
+        
+        if original_result and finetuned_result:
+            print("\n【比較結果】")
+            
+            print("\n■ 元モデルの予測")
+            print(f"予測カテゴリ: {original_result['predicted_category']}")
             print("カテゴリ別確率:")
-            for category, prob in result['probabilities'].items():
+            for category, prob in original_result['probabilities'].items():
                 print(f"  {category}: {prob:.4f}")
+            
+            print("\n■ 学習後モデルの予測")
+            print(f"予測カテゴリ: {finetuned_result['predicted_category']}")
+            print("カテゴリ別確率:")
+            for category, prob in finetuned_result['probabilities'].items():
+                print(f"  {category}: {prob:.4f}")
+            
+            if original_result['predicted_category'] != finetuned_result['predicted_category']:
+                print(f"\n※ 予測カテゴリが変化: {original_result['predicted_category']} → {finetuned_result['predicted_category']}")
+            
+            print("=" * 50)
 
 if __name__ == "__main__":
     main()
