@@ -1,115 +1,115 @@
-# BERT Fine-tuning for Job Classification
+# 職種分類のためのBERTファインチューニング
 
-This project implements a complete pipeline for fine-tuning BERT (Bidirectional Encoder Representations from Transformers) models to classify job descriptions into different categories. The system allows users to take a pre-trained BERT model and adapt it to recognize and categorize job postings into roles such as Data Scientist, Machine Learning Engineer, Software Engineer, and Consultant.
+このプロジェクトは、BERT（Bidirectional Encoder Representations from Transformers）モデルを職種説明文の分類にファインチューニングするための完全なパイプラインを実装しています。このシステムにより、ユーザーは事前学習済みのBERTモデルを取得し、データサイエンティスト、機械学習エンジニア、ソフトウェアエンジニア、コンサルタントなどの役割に求人情報を認識・分類するように適応させることができます。
 
-## Project Overview
+## プロジェクト概要
 
-The project consists of a sequential pipeline with four main stages:
+このプロジェクトは、4つの主要段階からなる順次パイプラインで構成されています：
 
-1. **Data Preparation**: Creates a sample dataset of job descriptions with corresponding category labels
-2. **Resource Acquisition**: Downloads the pre-trained BERT model and vocabulary files
-3. **Model Training**: Fine-tunes the BERT model on the job description dataset
-4. **Inference**: Uses the fine-tuned model to predict categories for new job descriptions
+1. **データ準備**: 職種説明文とそれに対応するカテゴリラベルのサンプルデータセットを作成
+2. **リソース取得**: 事前学習済みBERTモデルと語彙ファイルをダウンロード
+3. **モデル学習**: 職種説明文データセットでBERTモデルをファインチューニング
+4. **推論**: ファインチューニングされたモデルを使用して新しい職種説明文のカテゴリを予測
 
-## Features
+## 機能
 
-- Complete BERT fine-tuning pipeline for text classification
-- Custom tokenizer implementation for processing job descriptions
-- Visualization of learning curves and model performance metrics
-- Pre-defined job categories with sample data generation
-- Easy-to-use inference module for classifying new job descriptions
+- テキスト分類のための完全なBERTファインチューニングパイプライン
+- 職種説明文を処理するためのカスタムトークナイザー実装
+- 学習曲線とモデルパフォーマンス指標の可視化
+- サンプルデータ生成機能を備えた事前定義された職種カテゴリ
+- 新しい職種説明文を分類するための使いやすい推論モジュール
 
-## Project Structure
+## プロジェクト構造
 
 ```
 devin_tokunou_ft_bert/
-├── data/                # Directory for training and testing datasets
-├── vocab/               # Directory for BERT vocabulary files
-├── weights/             # Directory for pre-trained model weights
-├── results/             # Directory for fine-tuned model and learning curves
-├── utils/               # Utility modules
-│   ├── bert.py          # BERT model implementation
-│   ├── tokenizer.py     # Tokenization functionality
-│   └── __init__.py      # Package initialization
-├── main.py              # Main pipeline orchestration
-├── download_bert_files.py  # Downloads vocabulary and pre-trained weights
-├── create_sample_dataset.py # Generates training and testing datasets
-├── train_model.py       # Implements the fine-tuning process
-└── predict.py           # Provides inference functionality
+├── data/                # 学習用・テスト用データセットのディレクトリ
+├── vocab/               # BERT語彙ファイルのディレクトリ
+├── weights/             # 事前学習済みモデルの重みのディレクトリ
+├── results/             # ファインチューニングされたモデルと学習曲線のディレクトリ
+├── utils/               # ユーティリティモジュール
+│   ├── bert.py          # BERTモデルの実装
+│   ├── tokenizer.py     # トークン化機能
+│   └── __init__.py      # パッケージ初期化
+├── main.py              # メインパイプラインのオーケストレーション
+├── download_bert_files.py  # 語彙ファイルと事前学習済み重みのダウンロード
+├── create_sample_dataset.py # 学習用・テスト用データセットの生成
+├── train_model.py       # ファインチューニングプロセスの実装
+└── predict.py           # 推論機能の提供
 ```
 
-## Installation
+## インストール
 
-1. Clone the repository:
+1. リポジトリをクローン：
    ```bash
    git clone https://github.com/EM-Dev-Git/devin_tokunou_ft_bert.git
    cd devin_tokunou_ft_bert
    ```
 
-2. Install the required dependencies:
+2. 必要な依存関係をインストール：
    ```bash
    pip install torch pandas numpy matplotlib sklearn tqdm transformers
    ```
 
-## Usage
+## 使用方法
 
-### Running the Complete Pipeline
+### 完全なパイプラインの実行
 
-To execute the entire fine-tuning pipeline from data preparation to inference:
+データ準備から推論までの完全なファインチューニングパイプラインを実行するには：
 
 ```bash
 python main.py
 ```
 
-This will:
-1. Download the BERT vocabulary file and pre-trained model
-2. Create sample job description datasets
-3. Fine-tune the BERT model on the datasets
-4. Run inference on example job descriptions
+これにより以下が実行されます：
+1. BERT語彙ファイルと事前学習済みモデルのダウンロード
+2. 職種説明文のサンプルデータセットの作成
+3. データセットでのBERTモデルのファインチューニング
+4. サンプル職種説明文での推論の実行
 
-### Individual Components
+### 個別コンポーネント
 
-You can also run each component separately:
+各コンポーネントを個別に実行することもできます：
 
-1. Download BERT files:
+1. BERTファイルのダウンロード：
    ```bash
    python download_bert_files.py
    ```
 
-2. Create sample dataset:
+2. サンプルデータセットの作成：
    ```bash
    python create_sample_dataset.py
    ```
 
-3. Train the model:
+3. モデルの学習：
    ```bash
    python train_model.py
    ```
 
-4. Run inference:
+4. 推論の実行：
    ```bash
    python predict.py
    ```
 
-## Vocabulary File Usage
+## 語彙ファイルの用途
 
-The BERT vocabulary file (bert-base-uncased-vocab.txt) is a critical component that serves several purposes:
+BERT語彙ファイル（bert-base-uncased-vocab.txt）は、以下のような複数の重要な役割を果たす重要なコンポーネントです：
 
-1. Acts as a reference dictionary for tokenizing text input
-2. Assigns unique IDs to each token for model processing
-3. Provides mapping between tokens and their numerical representations
-4. Handles unknown words by replacing them with [UNK] token
-5. Enables conversion between token IDs and human-readable tokens
+1. テキスト入力をトークン化するための参照辞書として機能
+2. モデル処理のために各トークンに一意のIDを割り当て
+3. トークンとその数値表現の間のマッピングを提供
+4. 未知の単語を[UNK]トークンに置き換えて処理
+5. トークンIDと人間が読める形式のトークン間の変換を可能に
 
-## Model Architecture
+## モデルアーキテクチャ
 
-The project implements a custom BERT architecture with the following components:
+このプロジェクトは、以下のコンポーネントを持つカスタムBERTアーキテクチャを実装しています：
 
-- **BertTokenizer**: Handles text tokenization and conversion between tokens and IDs
-- **BertModel**: Implements the core BERT architecture with transformer layers
-- **BertForSequenceClassification**: Extends BertModel for text classification tasks
-- **JobDataset**: Custom dataset class for handling job description data
+- **BertTokenizer**: テキストのトークン化とトークンとID間の変換を処理
+- **BertModel**: トランスフォーマー層を持つコアBERTアーキテクチャを実装
+- **BertForSequenceClassification**: テキスト分類タスク用にBertModelを拡張
+- **JobDataset**: 職種説明文データを処理するためのカスタムデータセットクラス
 
-## License
+## ライセンス
 
-This project is available for educational and research purposes.
+このプロジェクトは教育および研究目的で利用可能です。
