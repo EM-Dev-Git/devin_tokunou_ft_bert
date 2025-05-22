@@ -37,8 +37,9 @@ def create_sample_dataset():
     
     機能:
     1. 求人情報のテキストとそれに対応するラベルからデータフレームを作成
-    2. データを訓練用とテスト用に分割（訓練:70%, テスト:30%）
-    3. 分割したデータをCSVファイルとして保存
+    2. データを100サンプルに拡張（各カテゴリ25サンプル）
+    3. データを訓練用とテスト用に分割（訓練:70%, テスト:30%）
+    4. 分割したデータをCSVファイルとして保存
     
     引数:
         なし
@@ -52,12 +53,27 @@ def create_sample_dataset():
         - 処理結果をコンソールに出力
     """
     
+    # 元のデータフレームを作成
     df = pd.DataFrame({
         'text': job_descriptions,  # テキスト列
         'label': labels            # ラベル列
     })
     
-    train_df, test_df = train_test_split(df, test_size=0.3, stratify=df['label'], random_state=42)
+    category_0 = df[df['label'] == 0]  # データサイエンティスト
+    category_1 = df[df['label'] == 1]  # 機械学習エンジニア
+    category_2 = df[df['label'] == 2]  # ソフトウェアエンジニア
+    category_3 = df[df['label'] == 3]  # コンサルタント
+    
+    expanded_df = pd.concat([
+        pd.concat([category_0] * 5),  # 5 * 5 = 25サンプル
+        pd.concat([category_1] * 5),  # 5 * 5 = 25サンプル
+        pd.concat([category_2] * 5),  # 5 * 5 = 25サンプル
+        pd.concat([category_3] * 5)   # 5 * 5 = 25サンプル
+    ]).reset_index(drop=True)
+    
+    expanded_df = expanded_df.sample(frac=1, random_state=42).reset_index(drop=True)
+    
+    train_df, test_df = train_test_split(expanded_df, test_size=0.3, stratify=expanded_df['label'], random_state=42)
     
     data_dir = os.path.join(os.path.expanduser("~"), "bert_finetuning_project", "data")
     

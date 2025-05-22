@@ -25,7 +25,7 @@ RESULTS_DIR = os.path.join(BASE_DIR, "results")
 MAX_SEQ_LENGTH = 128
 BATCH_SIZE = 16
 LEARNING_RATE = 2e-5
-NUM_EPOCHS = 8
+NUM_EPOCHS = 5
 NUM_LABELS = 4  # 4つの職種カテゴリ
 
 class JobDataset(Dataset):
